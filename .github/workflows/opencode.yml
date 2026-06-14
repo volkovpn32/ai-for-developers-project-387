@@ -18,8 +18,8 @@ jobs:
       contains(github.event.comment.body, '/opencode')) &&
       contains(fromJson('["OWNER", "COLLABORATOR", "MEMBER"]'), github.event.comment.author_association)
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
+    #permissions:
+    #  id-token: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6

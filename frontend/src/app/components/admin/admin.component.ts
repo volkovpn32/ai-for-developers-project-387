@@ -128,7 +128,7 @@ export class AdminComponent implements OnInit {
     }
   }
 
-  getEventTypeTitle(id: string): string {
+  resolveEventTypeTitle(id: string): string {
     return this.eventTypes.find(et => et.id === id)?.title ?? id;
   }
 

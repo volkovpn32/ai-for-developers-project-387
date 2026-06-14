@@ -102,7 +102,7 @@
         <tr *ngFor="let b of bookings">
           <td class="strong">{{ b.guestName }}</td>
           <td>{{ b.guestEmail }}</td>
-          <td><span class="badge">{{ getEventTypeTitle(b.eventTypeId) }}</span></td>
+          <td><span class="badge">{{ resolveEventTypeTitle(b.eventTypeId) }}</span></td>
           <td>{{ formatDateTime(b.startTime) }}</td>
           <td>{{ formatDateTime(b.endTime) }}</td>
         </tr>

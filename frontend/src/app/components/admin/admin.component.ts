@@ -129,7 +129,11 @@ export class AdminComponent implements OnInit {
   }
 
   resolveEventTypeTitle(id: string): string {
-    return this.eventTypes.find(et => et.id === id)?.title ?? id;
+    const et = this.eventTypes.find(et => et.id === id);
+    if (!et) {
+      console.error('Событие с id не найдено:', id);
+    }
+    return et?.title ?? 'Имя не задано';
   }
 
   formatDateTime(dateStr: string): string {

@@ -128,6 +128,10 @@ export class AdminComponent implements OnInit {
     }
   }
 
+  getEventTypeTitle(id: string): string {
+    return this.eventTypes.find(et => et.id === id)?.title ?? id;
+  }
+
   formatDateTime(dateStr: string): string {
     const d = new Date(dateStr);
     return d.toLocaleString('ru-RU', {

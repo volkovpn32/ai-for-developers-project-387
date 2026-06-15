@@ -94,12 +94,17 @@ jobs:
 
             For each CRITICAL issue create GitHub issue with:
               --title "Lighthouse Audit: {category} score is {score}"
-              --body "Current score: {score}
+              --body "Score: {score}
 
-            Top failing audits:
-            {list 3 worst audits with recommendations}
+            Raw values (from lighthouse-report.json):
+            - {metric name}: {value}
+            - {metric name}: {value}
+            - {metric name}: {value}
 
-            Full report: lighthouse-report artifact"
+            Top 3 failing audits:
+            1. {audit title} ({score}) — {description}
+            2. {audit title} ({score}) — {description}
+            3. {audit title} ({score}) — {description}"
 
             Save summary to lighthouse-summary.md containing all scores, issue count, and links.' }}
 

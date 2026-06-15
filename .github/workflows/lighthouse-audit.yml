@@ -84,12 +84,12 @@ jobs:
           prompt: |-
             ${{ inputs.prompt || 'Read lighthouse-report.json.
             Check category scores:
-            - performance < 80 → CRITICAL → create GitHub issue
-            - accessibility < 80 → CRITICAL → create GitHub issue
+            - performance < 80 → CRITICAL → create GitHub issue (NOT PR)
+            - accessibility < 80 → CRITICAL → create GitHub issue (NOT PR)
             - best-practices < 80 → WARNING (log only)
             - seo < 80 → WARNING (log only)
 
-            For each CRITICAL issue create an issue (NOT PR) in the current github project (if the same issue doesn't exists yet) with:
+            For each CRITICAL issue create an issue (NOT PR) in the current github project with:
               --title "Lighthouse Audit: {category} score is {score}"
               --body "Current score: {score}
 

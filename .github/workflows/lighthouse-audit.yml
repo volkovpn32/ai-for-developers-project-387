@@ -14,15 +14,13 @@ on:
         required: false
         default: ''
 
-permissions:
-  contents: read
-  issues: write
-
 jobs:
   lighthouse-audit:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
+      contents: read
+      issues: write
     steps:
       - uses: actions/checkout@v6
         with:
@@ -91,7 +89,7 @@ jobs:
             - best-practices < 80 → WARNING (log only)
             - seo < 80 → WARNING (log only)
 
-            For each CRITICAL issue use `gh issue create` with:
+            For each CRITICAL issue create an issue (NOT PR) in the current github project (if the same issue doesn't exists yet) with:
               --title "Lighthouse Audit: {category} score is {score}"
               --body "Current score: {score}
 

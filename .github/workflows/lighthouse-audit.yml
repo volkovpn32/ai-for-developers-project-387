@@ -81,15 +81,16 @@ jobs:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
         with:
           model: ${{ inputs.model || 'opencode/deepseek-v4-flash-free' }}
+          use_github_token: true
           prompt: |-
             ${{ inputs.prompt || 'Read lighthouse-report.json.
             Check category scores:
-            - performance < 80 → CRITICAL → create GitHub issue (NOT PR)
-            - accessibility < 80 → CRITICAL → create GitHub issue (NOT PR)
+            - performance < 80 → CRITICAL → create GitHub issue
+            - accessibility < 80 → CRITICAL → create GitHub issue
             - best-practices < 80 → WARNING (log only)
             - seo < 80 → WARNING (log only)
 
-            For each CRITICAL issue create an issue (NOT PR) in the current github project with:
+            For each CRITICAL issue create GitHub issue with:
               --title "Lighthouse Audit: {category} score is {score}"
               --body "Current score: {score}
 

@@ -68,14 +68,14 @@ jobs:
         run: |
           lighthouse http://localhost:4200 \
             --output json \
-            --output-path /tmp/lighthouse-report.json \
+            --output-path lighthouse-report.json \
             --chrome-flags="--headless --no-sandbox --disable-gpu"
 
       - name: Upload Lighthouse report
         uses: actions/upload-artifact@v4
         with:
           name: lighthouse-report
-          path: /tmp/lighthouse-report.json
+          path: lighthouse-report.json
 
       - name: Run OpenCode agent
         uses: anomalyco/opencode/github@latest
@@ -84,7 +84,7 @@ jobs:
         with:
           model: ${{ inputs.model || 'opencode/deepseek-v4-flash-free' }}
           prompt: |-
-            ${{ inputs.prompt || 'Read /tmp/lighthouse-report.json.
+            ${{ inputs.prompt || 'Read lighthouse-report.json.
             Check category scores:
             - performance < 80 → CRITICAL → create GitHub issue
             - accessibility < 80 → CRITICAL → create GitHub issue
@@ -100,7 +100,7 @@ jobs:
 
             Full report: lighthouse-report artifact"
 
-            Save summary to /tmp/lighthouse-summary.md containing all scores, issue count, and links.' }}
+            Save summary to lighthouse-summary.md containing all scores, issue count, and links.' }}
 
       - name: Upload audit summary
         uses: actions/upload-artifact@v4
@@ -108,4 +108,4 @@ jobs:
         continue-on-error: true
         with:
           name: lighthouse-summary
-          path: /tmp/lighthouse-summary.md
+          path: lighthouse-summary.md

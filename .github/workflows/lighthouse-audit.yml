@@ -1,0 +1,111 @@
+name: Lighthouse Audit
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    inputs:
+      model:
+        description: 'OpenCode model ID'
+        required: false
+        default: 'opencode/deepseek-v4-flash-free'
+      prompt:
+        description: 'Custom audit instructions (overrides default)'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  lighthouse-audit:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: frontend
+
+      - name: Start backend
+        run: |
+          ./gradlew quarkusDev &
+          for i in $(seq 1 60); do
+            curl -so /dev/null http://localhost:8080 2>/dev/null && break
+            sleep 2
+          done
+        working-directory: backend
+
+      - name: Start frontend dev server
+        run: |
+          npx ng serve --proxy-config proxy.conf.json --port 4200 --host 0.0.0.0 &
+          for i in $(seq 1 30); do
+            curl -so /dev/null http://localhost:4200 2>/dev/null && break
+            sleep 2
+          done
+        working-directory: frontend
+
+      - name: Install Lighthouse
+        run: npm install -g lighthouse
+
+      - name: Run Lighthouse audit
+        run: |
+          lighthouse http://localhost:4200 \
+            --output json \
+            --output-path /tmp/lighthouse-report.json \
+            --chrome-flags="--headless --no-sandbox --disable-gpu"
+
+      - name: Upload Lighthouse report
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-report
+          path: /tmp/lighthouse-report.json
+
+      - name: Run OpenCode agent
+        uses: anomalyco/opencode/github@latest
+        env:
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+        with:
+          model: ${{ inputs.model || 'opencode/deepseek-v4-flash-free' }}
+          prompt: |-
+            ${{ inputs.prompt || 'Read /tmp/lighthouse-report.json.
+            Check category scores:
+            - performance < 80 → CRITICAL → create GitHub issue
+            - accessibility < 80 → CRITICAL → create GitHub issue
+            - best-practices < 80 → WARNING (log only)
+            - seo < 80 → WARNING (log only)
+
+            For each CRITICAL issue use `gh issue create` with:
+              --title "Lighthouse Audit: {category} score is {score}"
+              --body "Current score: {score}
+
+            Top failing audits:
+            {list 3 worst audits with recommendations}
+
+            Full report: lighthouse-report artifact"
+
+            Save summary to /tmp/lighthouse-summary.md containing all scores, issue count, and links.' }}
+
+      - name: Upload audit summary
+        uses: actions/upload-artifact@v4
+        if: always()
+        continue-on-error: true
+        with:
+          name: lighthouse-summary
+          path: /tmp/lighthouse-summary.md
